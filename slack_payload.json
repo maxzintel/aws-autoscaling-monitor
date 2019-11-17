@@ -1,0 +1,38 @@
+{
+  "username": "Cloud Ops",
+  "icon_emoji": ":cloud:",
+  "channel": "123123123",
+  "text": ":aws: Autoscaling Event Captured - Target Deleted :downvote:",
+  "attachments": [
+    {
+      "color": "#7ACD0D",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Cluster:* \n *IP:*"
+          }
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "context",
+          "elements": [
+            {
+              "type": "image",
+              "image_url": "https://emoji.slack-edge.com/asdasd/bot/asdasdasd.png",
+              "alt_text": ":bot:"
+            },
+            {
+              "type": "plain_text",
+              "emoji": true,
+              "text": "Autoscaling Monitor"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

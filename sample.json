@@ -1,0 +1,27 @@
+{
+  "version": "0",
+  "id": "",
+  "detail-type": "EC2 Instance Launch Successful",
+  "source": "aws.autoscaling",
+  "account": "",
+  "time": "2015-11-11",
+  "region": "us-east-1",
+  "resources": [
+    "arn:aws:autoscaling:us-east-1:123456789012:autoScalingGroup:eb56123:autoScalingGroupName/sampleLaunchSucASG",
+    "arn:aws:ec2:us-east-1:1234567890:instance/i-"
+  ],
+  "detail": {
+    "StatusCode": "InProgress",
+    "AutoScalingGroupName": "sampleLaunchSucASG",
+    "ActivityId": "123456789",
+    "Details": {
+      "Availability Zone": "us-east-1b",
+      "Subnet ID": "subnet-123"
+    },
+    "RequestId": "123456789",
+    "EndTime": "2015-11-11",
+    "EC2InstanceId": "i-",
+    "StartTime": "2015-11-11",
+    "Cause": "At 2015-11-11 a user request created an AutoScalingGroup changing the desired capacity from 0 to 1.  At 2015-11-11 an instance was started in response to a difference between desired and actual capacity, increasing the capacity from 0 to 1."
+  }
+}
