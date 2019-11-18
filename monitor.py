@@ -125,9 +125,33 @@ def sendSlackMessage(nameOfInstance, ip, didCreate):
   r = requests.post(url=os.environ['SLACK_ENDPOINT'], data=json.dumps(slackPayload), headers=headers)
   print 'Slack response: %s' % str(r)
 
+# 1. Set base to clustername-worker.
+# 2. Get the array of all instances with a name tag containing the base.
+# 3. Set i = 1, for each i++ < ARRAYCOUNT+1, edit tag Name to base{$i}
+# 4. Make an api call to trigger script to update shared ssh configs, keeps cluster instances seamlessly accessible even while autoscaling is ongoing.
+
 def findEC2Name(ec2Info):
   tags = ec2Info['Reservations'][0]['Instances'][0]['Tags']
+  base = 'clustername-worker'
+  # (2) aws ec2 describe-instances --filters "Name=tag:Name,Values=name*" --profile profile
+  #     Probably need jq (or equivalent in python) to inject these ids into a file.
+  #  for i in range(len(currentInstancesInfo)): Useful for initial loop?
+  #  Also useful:
+  #  for ip in notMatchingIps:
+    # if removeFromTargetGroup(ip, loadBalancer):
+    #   try:
+    #     sendSlackMessage(findEC2Name(ec2.describe_instances(InstanceIds=[ec2Id])), ip, False)
+    #   except:
+    #     sendSlackMessage('Could not find name', ip, False)
+  workers = ec2.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': base*}], DryRun=True)
+  for worker in workers["Reservations"]:
+    for instance in worker["Instances"]:
+      instanceID = ec2Resource.Instance(instance["InstanceId"])
+      print(instanceID)
+  # (3) aws ec2 create-tags --resources i-xxx --tags Key=Name,Value=new-value --profile profile
+      ec2.create_tags(Resources=instanceID, Tags={'Key':'Name','Value':base + )
 
   for tag in tags:
-    if tag['Key'] == 'Name':
+    if tag['Key'] == 'Name'
+      ec2.create_tags(Resources=[ec2Info], Tags=[{‘Key’:’Name’, ‘Value’:’clustname-worker07’}])
       return tag['Value']
