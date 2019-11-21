@@ -129,13 +129,17 @@ def sendSlackMessage(nameOfInstance, ip, didCreate):
   # bash syntax would just be: curl --user $BAMBOO_USER:$BAMBOO_PASS -X POST -d "$STAGE_NAME&ExecuteAllStages" $url
   # here we will likely have to use the requests library.
   HOST = 'an environment variable to be set later.'
-  BAMBOO_USER = 'an environment variable to be set later.'
-  BAMBOO_PASS = 'an environment variable to be set later.'
+  BAMBOO_USERPASS = 'username:password'
   PROJECT_NAME = 'an environment variable to be set later.'
   PLAN_NAME = 'an environment variable to be set later.'
   STAGE_NAME = 'an environment variable to be set later.'
-  
   url = '{HOST}/rest/api/latest/queue/{PROJECT_NAME}-{PLAN_NAME}'
+  HEADERS = {'Authorization':'Basic %s'% BAMBOO_USERPASS}
+  print 'Sending api call to %s'% url
+  response = requests.Get(url,headers=HEADERS)
+  content = response.content
+  print 'Call sent, response: %s'% content
+
 
 # 1. Set base to clustername-worker.
 # 2. Get the array of all instances with a name tag containing the base.
