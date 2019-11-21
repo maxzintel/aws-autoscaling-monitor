@@ -125,6 +125,18 @@ def sendSlackMessage(nameOfInstance, ip, didCreate):
   r = requests.post(url=os.environ['SLACK_ENDPOINT'], data=json.dumps(slackPayload), headers=headers)
   print 'Slack response: %s' % str(r)
 
+  # (4) Bamboo Call Using Requests
+  # bash syntax would just be: curl --user $BAMBOO_USER:$BAMBOO_PASS -X POST -d "$STAGE_NAME&ExecuteAllStages" $url
+  # here we will likely have to use the requests library.
+  HOST = 'an environment variable to be set later.'
+  BAMBOO_USER = 'an environment variable to be set later.'
+  BAMBOO_PASS = 'an environment variable to be set later.'
+  PROJECT_NAME = 'an environment variable to be set later.'
+  PLAN_NAME = 'an environment variable to be set later.'
+  STAGE_NAME = 'an environment variable to be set later.'
+  
+  url = '{HOST}/rest/api/latest/queue/{PROJECT_NAME}-{PLAN_NAME}'
+
 # 1. Set base to clustername-worker.
 # 2. Get the array of all instances with a name tag containing the base.
 # 3. Set i = 1, for each i++ < ARRAYCOUNT+1, edit tag Name to base{$i}
