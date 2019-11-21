@@ -145,11 +145,16 @@ def findEC2Name(ec2Info):
     #     sendSlackMessage('Could not find name', ip, False)
   workers = ec2.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': base*}], DryRun=True)
   for worker in workers["Reservations"]:
+    workerCount = len(workers["Reservations"])
     for instance in worker["Instances"]:
       instanceID = ec2Resource.Instance(instance["InstanceId"])
       print(instanceID)
   # (3) aws ec2 create-tags --resources i-xxx --tags Key=Name,Value=new-value --profile profile
-      ec2.create_tags(Resources=instanceID, Tags={'Key':'Name','Value':base + )
+      i = 0
+      while i < workerCount+1:
+        custom = base + i
+        ec2.create_tags(Resources=instanceID, Tags={'Key':'Name','Value':custom})
+        i+=1
 
   for tag in tags:
     if tag['Key'] == 'Name'
