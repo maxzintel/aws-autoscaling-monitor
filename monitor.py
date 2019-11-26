@@ -126,17 +126,13 @@ def sendSlackMessage(nameOfInstance, ip, didCreate):
   print 'Slack response: %s' % str(r)
 
   # (4) Bamboo Call Using Requests
-  HOST = 'an environment variable to be set later.'
-  BAMBOO_USERPASS = 'username:password'
-  PROJECT_NAME = 'an environment variable to be set later.'
-  PLAN_NAME = 'an environment variable to be set later.'
-  STAGE_NAME = 'an environment variable to be set later.'
-  url = '{HOST}/rest/api/latest/queue/{PROJECT_NAME}-{PLAN_NAME}'
-  HEADERS = {'Authorization':'Basic %s'% BAMBOO_USERPASS}
-  print 'Sending api call to %s'% url
+  BAMBOO_USERPASS = os.environ['BAMBOO_USERPASS']
+  url = os.environ['URL']
+  HEADERS = {'Authorization':'Basic `%s`'% BAMBOO_USERPASS}
+  print 'Sending api call to `%s`'% url
   response = requests.Get(url,headers=HEADERS)
   content = response.content
-  print 'Call sent, response: %s'% content
+  print 'Call sent, response: `%s`'% content
 
 # 1. Set base to clustername-worker.
 # 2. Get the array of all instances with a name tag containing the base.
@@ -148,22 +144,32 @@ def findEC2Name(ec2Info):
   tags = ec2Info['Reservations'][0]['Instances'][0]['Tags']
   # (1)
   base = 'clustername-worker'
-  workers = ec2.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': base*}], DryRun=True)
+  baseWild = 'clustername-worker*'
   # (2)
+  workers = ec2.describe_instances(Filters=[
+    {
+      'Name': 'tag:Name',
+      'Values':
+        [
+          baseWild
+        ]
+    }
+  ]) # %(baseWild)
+  # (3)
   for worker in workers["Reservations"]:
-    workerCount = len(workers["Reservations"])
     for instance in worker["Instances"]:
       instanceID = ec2Resource.Instance(instance["InstanceId"])
       print(instanceID)
-  # (3)
       i = 0
       #  for i in range(workerCount)
-      while i < workerCount+1:
-        custom = base + i
-        ec2.create_tags(Resources=instanceID, Tags={'Key':'Name','Value':custom})
+      for i in range(len(workers["Reservations"])):
+        custom = base + str(i)
+        ec2.create_tags(DryRun=True, Resources=instanceID, Tags=[{
+          'Key': 'Name',
+          'Value': custom
+        }])
         i+=1
 
   for tag in tags:
-    if tag['Key'] == 'Name'
-      ec2.create_tags(Resources=[ec2Info], Tags=[{‘Key’:’Name’, ‘Value’:’clustname-worker07’}])
+    if tag['Key'] == 'Name':
       return tag['Value']
