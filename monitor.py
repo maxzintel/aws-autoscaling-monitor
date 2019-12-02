@@ -141,8 +141,14 @@ def sendSlackMessage(nameOfInstance, ip, didCreate):
 # This will keep cluster instances seamlessly accessible via even while autoscaling is ongoing.
 
 def findEC2Name(ec2Info):
+  renameWorkers
   tags = ec2Info['Reservations'][0]['Instances'][0]['Tags']
   # (1)
+  for tag in tags:
+    if tag['Key'] == 'Name':
+      return tag['Value']
+
+def renameWorkers():
   base = 'clustername-worker'
   baseWild = 'clustername-worker*'
   # (2)
@@ -159,7 +165,6 @@ def findEC2Name(ec2Info):
   for worker in workers["Reservations"]:
     for instance in worker["Instances"]:
       instanceID = ec2Resource.Instance(instance["InstanceId"])
-      print(instanceID)
       i = 0
       #  for i in range(workerCount)
       for i in range(len(workers["Reservations"])):
@@ -170,6 +175,10 @@ def findEC2Name(ec2Info):
         }])
         i+=1
 
-  for tag in tags:
-    if tag['Key'] == 'Name':
-      return tag['Value']
+  # Rename EC2 in different class.
+  # Old: findEC2Name(ec2Info)
+  # The given ec2Id passes through the instance id...
+  # ... from the event.
+  # ec2Info runs describe instances against the above id.
+  # findEC2Name then gets the tags from the json returned from...
+  # ... ec2Info, and for each instance it will return the Name.
