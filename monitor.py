@@ -120,12 +120,10 @@ def sendSlackMessage(nameOfInstance, ip, didCreate):
     slackPayload['text'] = 'Autoscaling Event Captured - Target Deleted :downvote:'
     slackPayload['attachments'][0]['blocks'][0]['text']['text'] = '*Cluster:* name \n *Instance:* `%s` \n *IP:* `%s`' %(nameOfInstance, ip)
 
-
   print 'Sending slack message'
   r = requests.post(url=os.environ['SLACK_ENDPOINT'], data=json.dumps(slackPayload), headers=headers)
   print 'Slack response: %s' % str(r)
 
-  # (4) Bamboo Call Using Requests
   BAMBOO_USERPASS = os.environ['BAMBOO_USERPASS']
   url = os.environ['URL']
   HEADERS = {'Authorization':'Basic `%s`'% BAMBOO_USERPASS}
@@ -134,16 +132,9 @@ def sendSlackMessage(nameOfInstance, ip, didCreate):
   content = response.content
   print 'Call sent, response: `%s`'% content
 
-# 1. Set base to clustername-worker.
-# 2. Get the array of all instances with a name tag containing the base.
-# 3. For each instance id in the array, edit the name tag.
-# 4. Make an api call to trigger script to update shared ssh configs...
-# This will keep cluster instances seamlessly accessible via even while autoscaling is ongoing.
-
 def findEC2Name(ec2Info):
   renameWorkers
   tags = ec2Info['Reservations'][0]['Instances'][0]['Tags']
-  # (1)
   for tag in tags:
     if tag['Key'] == 'Name':
       return tag['Value']
@@ -151,7 +142,6 @@ def findEC2Name(ec2Info):
 def renameWorkers():
   base = 'clustername-worker'
   baseWild = 'clustername-worker*'
-  # (2)
   workers = ec2.describe_instances(Filters=[
     {
       'Name': 'tag:Name',
@@ -160,13 +150,11 @@ def renameWorkers():
           baseWild
         ]
     }
-  ]) # %(baseWild)
-  # (3)
+  ])
   for worker in workers["Reservations"]:
     for instance in worker["Instances"]:
       instanceID = ec2Resource.Instance(instance["InstanceId"])
       i = 0
-      #  for i in range(workerCount)
       for i in range(len(workers["Reservations"])):
         custom = base + str(i)
         ec2.create_tags(DryRun=True, Resources=instanceID, Tags=[{
@@ -174,11 +162,3 @@ def renameWorkers():
           'Value': custom
         }])
         i+=1
-
-  # Rename EC2 in different class.
-  # Old: findEC2Name(ec2Info)
-  # The given ec2Id passes through the instance id...
-  # ... from the event.
-  # ec2Info runs describe instances against the above id.
-  # findEC2Name then gets the tags from the json returned from...
-  # ... ec2Info, and for each instance it will return the Name.
