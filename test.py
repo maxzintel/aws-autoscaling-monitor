@@ -35,10 +35,11 @@ def handler(event, context):
             Tags=[
               {
                 'Key': 'Name',
-                'Value': '`%s`'% str(custom)
+                'Value': str(custom)
               }
             ]
           )
           i+=1
+
 
   return 'successful, %s'% str(custom)
