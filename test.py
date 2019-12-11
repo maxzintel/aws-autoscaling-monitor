@@ -21,5 +21,24 @@ def handler(event, context):
           ]
       }
     ])
+    for worker in workers["Reservations"]:
+      for instance in worker["Instances"]:
+        workerCount = len(workers["Reservations"])
+        instanceID = str(instance["InstanceId"])
+        for i in range(workerCount):
+          custom = base + str(i)
+          ec2.create_tags(
+            DryRun=False,
+            Resources=[
+              instanceID
+            ],
+            Tags=[
+              {
+                'Key': 'Name',
+                'Value': '`%s`'% str(custom)
+              }
+            ]
+          )
+          i+=1
 
-  return 'successful, %s'% str(workers)
+  return 'successful, %s'% str(custom)
