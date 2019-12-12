@@ -140,8 +140,8 @@ def findEC2Name(ec2Info):
       return tag['Value']
 
 def renameWorkers():
-  base = 'clustername-worker'
-  baseWild = 'clustername-worker*'
+  base = 'test'
+  baseWild = 'test*'
   workers = ec2.describe_instances(Filters=[
     {
       'Name': 'tag:Name',
@@ -151,14 +151,23 @@ def renameWorkers():
         ]
     }
   ])
-  for worker in workers["Reservations"]:
-    for instance in worker["Instances"]:
-      instanceID = ec2Resource.Instance(instance["InstanceId"])
-      i = 0
-      for i in range(len(workers["Reservations"])):
-        custom = base + str(i)
-        ec2.create_tags(DryRun=True, Resources=instanceID, Tags=[{
-          'Key': 'Name',
-          'Value': custom
-        }])
-        i+=1
+  workerCount = len(matched["Reservations"])
+  for i in range(0, workerCount):
+    for instanceObj in matched["Reservations"]:
+      instanceID = str(instanceObj["Instances"][0]["InstanceId"])
+      custom = base + str(i)
+      ec2.create_tags(
+        DryRun=False,
+        Resources=[
+          instanceID
+        ],
+        Tags=[
+          {
+            'Key': 'Name',
+            'Value': str(custom)
+          }
+        ]
+      )
+      i+=1
+    else:
+      return 'successful, ' + str(workerCount)
